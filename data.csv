@@ -1,0 +1,13 @@
+;;;;;;
+;Назва поля;Тип даних;Можливі значення;Пояснення;;
+;id;string;every;Унікальний інтедифікатор для стрічки;;
+;title ;string;every;Назва стрічки;;
+;type ;;tvSeries, tvMiniSeries,   movie;Тип стрічки;;
+;genres ;string;Some of 27 Genres;Жанр стрічки;;
+;averageRating;float;max: 2964641,                min: 5000,                     avg: 116363,            mising: unknown;Середня оцінка;;
+; numVotes ;int;max: 10,                min: 5,                     avg: 8,3,            mising: 14 ;Кількість оцінок;;
+;releaseYear;int;max: 2024,           min: 1916,             avg: 1970,       mising: 2;Рік випуску стрічки;;
+;;;;;;
+;;;;;;
+;;;;;;
+;;;;;;

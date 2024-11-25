@@ -1,0 +1,81 @@
+﻿<Window x:Class="UI.Window1"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Manage Types and Genres" Height="363" Width="800">
+    <Window.Resources>
+        <!-- Стиль для кнопок -->
+        <Style x:Key="CustomButtonStyle" TargetType="Button">
+            <Setter Property="Width" Value="220" />
+            <Setter Property="Height" Value="40" />
+            <Setter Property="Background" Value="#FF5D9CEC" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="BorderBrush" Value="#FF34568B" />
+            <Setter Property="BorderThickness" Value="2" />
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect Color="Black" BlurRadius="10" ShadowDepth="3" />
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Стиль для текстових полів -->
+        <Style x:Key="CustomTextBoxStyle" TargetType="TextBox">
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="Padding" Value="10" />
+            <Setter Property="Background" Value="White" />
+            <Setter Property="BorderBrush" Value="#FF34568B" />
+            <Setter Property="BorderThickness" Value="2" />
+        </Style>
+
+        <!-- Стиль для ComboBox -->
+        <Style x:Key="CustomComboBoxStyle" TargetType="ComboBox">
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="Padding" Value="10" />
+            <Setter Property="Background" Value="White" />
+            <Setter Property="BorderBrush" Value="#FF34568B" />
+            <Setter Property="BorderThickness" Value="2" />
+        </Style>
+
+        <!-- Фон Grid -->
+        <LinearGradientBrush x:Key="CustomBackgroundBrush" StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Color="#FF5D9CEC" Offset="0" />
+            <GradientStop Color="#FF34568B" Offset="1" />
+        </LinearGradientBrush>
+    </Window.Resources>
+
+    <Grid Margin="0">
+        <Grid.Background>
+            <StaticResource ResourceKey="CustomBackgroundBrush" />
+        </Grid.Background>
+
+        <!-- Панель вкладок -->
+        <TabControl>
+            <!-- Вкладка для типів -->
+            <TabItem Header="Types">
+                <StackPanel>
+                    <!-- Список типів -->
+                    <ListBox x:Name="TypesListBox" Margin="10,10,10,50" DisplayMemberPath="name" ScrollViewer.VerticalScrollBarVisibility="Auto" Height="200" />
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Bottom">
+                        <Button Content="Add Type" Width="100" Click="AddType_Click" Margin="5"/>
+                        <Button Content="Edit Type" Width="100" Click="EditType_Click" Margin="5"/>
+                        <Button Content="Delete Type" Width="100" Click="DeleteType_Click" Margin="5"/>
+                    </StackPanel>
+                </StackPanel>
+            </TabItem>
+
+            <!-- Вкладка для жанрів -->
+            <TabItem Header="Genres">
+                <StackPanel>
+                    <!-- Список жанрів -->
+                    <ListBox x:Name="GenresListBox" Margin="10,10,10,50" DisplayMemberPath="name" ScrollViewer.VerticalScrollBarVisibility="Auto" Height="200" />
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Bottom">
+                        <Button Content="Add Genre" Width="100" Click="AddGenre_Click" Margin="5"/>
+                        <Button Content="Edit Genre" Width="100" Click="EditGenre_Click" Margin="5"/>
+                        <Button Content="Delete Genre" Width="100" Click="DeleteGenre_Click" Margin="5"/>
+                    </StackPanel>
+                </StackPanel>
+            </TabItem>
+        </TabControl>
+    </Grid>
+</Window>

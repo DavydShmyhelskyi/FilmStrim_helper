@@ -1,0 +1,192 @@
+﻿<Window x:Class="UI.SortedFilms"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="SortedFilms" Height="862" Width="800">
+    <Window.Resources>
+        <!-- Стиль для кнопок -->
+        <Style x:Key="CustomButtonStyle" TargetType="Button">
+            <Setter Property="Width" Value="220" />
+            <Setter Property="Height" Value="40" />
+            <Setter Property="Background" Value="#FF5D9CEC" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="BorderBrush" Value="#FF34568B" />
+            <Setter Property="BorderThickness" Value="2" />
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect Color="Black" BlurRadius="10" ShadowDepth="3" />
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Стиль для текстових полів -->
+        <Style x:Key="CustomTextBoxStyle" TargetType="TextBox">
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="Padding" Value="10" />
+            <Setter Property="Background" Value="White" />
+            <Setter Property="BorderBrush" Value="#FF34568B" />
+            <Setter Property="BorderThickness" Value="2" />
+        </Style>
+
+        <!-- Стиль для ComboBox -->
+        <Style x:Key="CustomComboBoxStyle" TargetType="ComboBox">
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="Padding" Value="10" />
+            <Setter Property="Background" Value="White" />
+            <Setter Property="BorderBrush" Value="#FF34568B" />
+            <Setter Property="BorderThickness" Value="2" />
+        </Style>
+
+        <!-- Фон Grid -->
+        <LinearGradientBrush x:Key="CustomBackgroundBrush" StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Color="#FF5D9CEC" Offset="0" />
+            <GradientStop Color="#FF34568B" Offset="1" />
+        </LinearGradientBrush>
+    </Window.Resources>
+
+    <Grid Margin="0,0,0,18">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="370*"/>
+            <RowDefinition Height="71*"/>
+        </Grid.RowDefinitions>
+        <Grid.Background>
+            <StaticResource ResourceKey="CustomBackgroundBrush" />
+        </Grid.Background>
+
+        <!-- Кнопки для сортування -->
+        <Button Content="SORT BY YEAR"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+                Margin="10,177,0,0"
+                Style="{StaticResource CustomButtonStyle}"
+                Click="YearB"
+                ToolTip="Натисніть, щоб сортувати фільми за роком" Height="40" Width="150" />
+        <Button Content="SORT BY RATING"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+                Margin="186,176,0,0"
+                Style="{StaticResource CustomButtonStyle}"
+                Click="Button_Click"
+                ToolTip="Натисніть, щоб сортувати фільми за рейтингом" Height="40" Width="152" />
+        <Button Content="SORT BY VOTES"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Top"
+                Margin="0,177,286,0"
+                Style="{StaticResource CustomButtonStyle}"
+                Click="VotesB"
+                ToolTip="Натисніть, щоб сортувати фільми за кількістю голосів" Height="40" Width="151" />
+
+        <!-- Кнопки пошуку -->
+        <Button Content="SEARCH BY TYPE"
+                Width="271"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+                Margin="519,6,0,0"
+                Style="{StaticResource CustomButtonStyle}"
+                Click="TypeB"
+                ToolTip="Натисніть, щоб шукати за типом" Height="40" />
+        <Button Content="SEARCH BY GENRE"
+                Width="271"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+                Margin="519,46,0,0"
+                Style="{StaticResource CustomButtonStyle}"
+                Click="Button_Click_Genre"
+                ToolTip="Натисніть, щоб шукати за жанром" Height="40" />
+        <Button Content="SEARCH BY YEAR"
+                Width="271"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+                Margin="519,86,0,0"
+                Style="{StaticResource CustomButtonStyle}"
+                Click="Button_Click_Year"
+                ToolTip="Натисніть, щоб шукати за роком" Height="40" />
+        <Button Content="SEARCH BY NAME"
+                Width="271"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+                Margin="519,126,0,0"
+                Style="{StaticResource CustomButtonStyle}"
+                Click="Button_Click_Search"
+                ToolTip="Натисніть, щоб шукати за назвою" Height="40" />
+
+        <!-- Текстові поля для пошуку -->
+        <TextBox x:Name="Search_Name"
+                 Text=""
+                 Margin="10,126,286,0"
+                 VerticalAlignment="Top"
+                 ToolTip="Введіть назву фільму"
+                 Style="{StaticResource CustomTextBoxStyle}" Height="45" />
+
+        <!-- Комбо-бокси -->
+        <ComboBox Name="TypeComboBox"
+          Margin="10,0,286,0"
+          VerticalAlignment="Top"
+          ToolTip="Виберіть тип"
+          Style="{StaticResource CustomComboBoxStyle}" Height="41">
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <!-- Відображення властивості "name" -->
+                    <TextBlock Text="{Binding name}" />
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
+
+        <ComboBox Name="GenreCbox"
+          Margin="10,42,286,0"
+          VerticalAlignment="Top"
+          ToolTip="Виберіть жанр"
+          Style="{StaticResource CustomComboBoxStyle}" Height="41">
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <!-- Відображення властивості "name" -->
+                    <TextBlock Text="{Binding name}" />
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
+
+
+        <!-- Список фільмів -->
+        <ListBox x:Name="FilmsListbox"
+         FontSize="16"
+         Margin="10,222,10,0"
+         Padding="10"
+         Background="White"
+         BorderBrush="#FF34568B"
+         BorderThickness="2"
+         VerticalAlignment="Top" Height="529" Grid.RowSpan="2">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Vertical">
+                        <TextBlock Text="{Binding id, StringFormat='ID: {0:F1}'}" />
+                        <TextBlock Text="{Binding name}" FontWeight="Bold" />
+                    </StackPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+        <Button Content="Report"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Top"
+            Style="{StaticResource CustomButtonStyle}"
+            Click="ReportB"
+            ToolTip="Натисніть, щоб сортувати фільми за кількістю голосів" Grid.Row="1" Height="55" Width="780" Margin="0,61,0,0" />
+        <TextBox x:Name="Search_Year_Copy"
+            Text=""
+            Margin="10,86,286,0"
+            VerticalAlignment="Top"
+            ToolTip="Введіть рік"
+            Style="{StaticResource CustomTextBoxStyle}" Height="45" />
+        <Button Content="SORT BY EVERY FIELD"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            Margin="519,166,0,0"
+            Style="{StaticResource CustomButtonStyle}"
+            Click="FIELD_Click"
+            ToolTip="Натисніть, щоб сортувати фільми за рейтингом" Height="40" Width="271" />
+
+
+    </Grid>
+</Window>

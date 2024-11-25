@@ -1,0 +1,121 @@
+﻿<Window x:Class="UI.Operations"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="Operations" Height="702" Width="1567">
+    <Window.Resources>
+        <!-- Стиль для кнопок -->
+        <Style x:Key="CustomButtonStyle" TargetType="Button">
+            <Setter Property="Width" Value="220" />
+            <Setter Property="Height" Value="40" />
+            <Setter Property="Background" Value="#FF5D9CEC" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="BorderBrush" Value="#FF34568B" />
+            <Setter Property="BorderThickness" Value="2" />
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect Color="Black" BlurRadius="10" ShadowDepth="3" />
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Стиль для текстових полів -->
+        <Style x:Key="CustomTextBoxStyle" TargetType="TextBox">
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="Padding" Value="10" />
+            <Setter Property="Background" Value="White" />
+            <Setter Property="BorderBrush" Value="#FF34568B" />
+            <Setter Property="BorderThickness" Value="2" />
+        </Style>
+
+        <!-- Стиль для ComboBox -->
+        <Style x:Key="CustomComboBoxStyle" TargetType="ComboBox">
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="Padding" Value="10" />
+            <Setter Property="Background" Value="White" />
+            <Setter Property="BorderBrush" Value="#FF34568B" />
+            <Setter Property="BorderThickness" Value="2" />
+        </Style>
+
+        <!-- Фон Grid -->
+        <LinearGradientBrush x:Key="CustomBackgroundBrush" StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Color="#FF5D9CEC" Offset="0" />
+            <GradientStop Color="#FF34568B" Offset="1" />
+        </LinearGradientBrush>
+    </Window.Resources>
+
+    <Grid Margin="0,0,0,0">
+        <Grid.Background>
+            <StaticResource ResourceKey="CustomBackgroundBrush" />
+        </Grid.Background>
+
+        <!-- Ліва частина: панель керування -->
+        <StackPanel Orientation="Vertical" Margin="58,40,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Height="680" Width="661">
+            <TextBlock Text="Manage Films" FontSize="20" FontWeight="Bold" Foreground="White" Margin="0,0,0,10" HorizontalAlignment="Center" />
+
+            <!-- Поля для додавання/редагування -->
+            <TextBox x:Name="FilmNameTextBox" Text="Film Name" Style="{StaticResource CustomTextBoxStyle}" ToolTip="Enter film name" Margin="0,0,0,10" />
+            <TextBox x:Name="VotesTextBox" Text="Votes" Style="{StaticResource CustomTextBoxStyle}" ToolTip="Enter number of votes" Margin="0,0,0,10" />
+
+            <!-- Вибір типу -->
+            <ComboBox x:Name="TypeComboBoxCRUD" Style="{StaticResource CustomComboBoxStyle}" ToolTip="Select Type" Margin="0,0,0,10">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding name}" />
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+
+            <!-- Вибір жанрів через CheckBox -->
+            <ListBox x:Name="GenreCheckedListBox"
+                     Width="666" Height="150"                     
+         Margin="0,0,0,10"
+         Background="White"
+         BorderBrush="#FF34568B"
+         BorderThickness="2">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <CheckBox Content="{Binding Genre.name}" IsChecked="{Binding IsChecked}" />
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+
+
+            <TextBox x:Name="YearTextBox" Text="Release Year" Style="{StaticResource CustomTextBoxStyle}" ToolTip="Enter release year" Margin="0,0,0,10" />
+            <TextBox x:Name="RatingTextBox" Text="Average Rating" Style="{StaticResource CustomTextBoxStyle}" ToolTip="Enter average rating" Margin="0,0,0,10" Height="51" />
+
+            <!-- Кнопки -->
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,20,0,0">
+                <Button Content="Refresh data" Style="{StaticResource CustomButtonStyle}" Click="Click" Width="151" RenderTransformOrigin="0.316,-3.787" />
+                <Button Content="Add Film" Style="{StaticResource CustomButtonStyle}" Click="AddFilmButton_Click" Margin="5,0,5,0" Width="151" />
+                <Button Content="Update Film" Style="{StaticResource CustomButtonStyle}" Click="UpdateFilmButton_Click" Margin="5,0,5,0" Width="150" />
+                <Button Content="Delete Film" Style="{StaticResource CustomButtonStyle}" Click="DeleteFilmButton_Click" Width="150" />
+            </StackPanel>
+            <Button Content="Genres and Types" Style="{StaticResource CustomButtonStyle}" Click="Open_Click" Width="623" />
+        </StackPanel>
+
+        <!-- Права частина: список фільмів -->
+        <ListBox x:Name="FilmsListbox"
+                 FontSize="16"
+                 Margin="797,0,44,0"
+                 Padding="10"
+                 Background="White"
+                 BorderBrush="#FF34568B"
+                 BorderThickness="2"
+                 VerticalAlignment="Center"
+                 Height="586">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Vertical">
+                        <TextBlock Text="{Binding id, StringFormat='ID: {0:F1}'}" />
+                        <TextBlock Text="{Binding name}" FontWeight="Bold" />
+                    </StackPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+
+    </Grid>
+</Window>

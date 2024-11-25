@@ -1,0 +1,1060 @@
+﻿using Microsoft.EntityFrameworkCore;
+using Core;
+using Core.OtherTables;
+
+namespace Repositorys.Context
+{
+    public class FilmstripContext : DbContext
+    {
+        public DbSet<Filmstrip> Filmstrips => Set<Filmstrip>();
+        public DbSet<Genre> Genres => Set<Genre>();
+        public DbSet<Types> Types => Set<Types>();
+        public DbSet<YearRelease> YearReleases => Set<YearRelease>();
+        public DbSet<AvarageRating> AvarageRatings => Set<AvarageRating>();
+        public DbSet<FilmstripGenre> FilmstripGenres => Set<FilmstripGenre>();
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.UseSqlServer("Server=localhost,1433; Database=MoviesDBNoWayToLive; User=sa; Password=Admin123!Braaah1; Encrypt=True; TrustServerCertificate=True;");
+            base.OnConfiguring(optionsBuilder);
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            // Налаштування зв’язку "багато-до-багатьох" між Filmstrip та Genre через FilmstripGenre
+            modelBuilder.Entity<FilmstripGenre>()
+                .HasKey(fg => new { fg.FilmstripId, fg.GenreId }); // Композитний ключ
+
+            modelBuilder.Entity<FilmstripGenre>()
+                .HasOne(fg => fg.Filmstrip)
+                .WithMany(f => f.FilmstripGenres)
+                .HasForeignKey(fg => fg.FilmstripId);
+
+            modelBuilder.Entity<FilmstripGenre>()
+                .HasOne(fg => fg.Genre)
+                .WithMany(g => g.FilmstripGenres)
+                .HasForeignKey(fg => fg.GenreId);
+
+            // Зв’язок "один-до-багатьох" між Filmstrip та YearRelease
+            modelBuilder.Entity<Filmstrip>()
+                .HasOne(f => f.yearRelease)
+                .WithMany(yr => yr.Filmstrips)
+                .HasForeignKey(f => f.yearReleaseId)
+                .OnDelete(DeleteBehavior.Cascade); // Опціонально: каскадне видалення
+
+            // Зв’язок "один-до-багатьох" між Filmstrip та AvarageRating
+            modelBuilder.Entity<Filmstrip>()
+                .HasOne(f => f.avarageRating)
+                .WithMany(ar => ar.Filmstrips)
+                .HasForeignKey(f => f.avarageRatingsId)
+                .OnDelete(DeleteBehavior.Cascade); // Опціонально: каскадне видалення
+
+            // Зв’язок "один-до-багатьох" між Filmstrip та Types
+            modelBuilder.Entity<Filmstrip>()
+                .HasOne(f => f.type)
+                .WithMany(t => t.Filmstrips)
+                .HasForeignKey(f => f.typeId)
+                .OnDelete(DeleteBehavior.Cascade); // Опціонально: каскадне видалення
+
+            base.OnModelCreating(modelBuilder);
+        }
+    }
+}
+namespace Repositorys.Interfaces
+{
+    public interface BaseInterface<T>
+    {
+        void Create(T entity);
+        IEnumerable<T> Get();
+        T Get(int id);
+        void Update(T entity);
+        void Delete(int id);
+        void SaveChanges();
+
+    }
+}
+namespace Repositorys.Interfaces
+{
+    public interface BaseInterfaceFILMS<T>
+    {
+        void Create(T entity);
+        IEnumerable<T> Get();
+        T Get(string id);
+        void Update(T entity);
+        void Delete(string id);
+        void SaveChanges();
+    }
+}
+using Core;
+using Repositorys.Context;
+using Repositorys.Interfaces;
+
+namespace Repositorys.Repositories
+{
+    public class FilmstripRepository : BaseInterfaceFILMS<Filmstrip>
+    {
+        private readonly FilmstripContext _context;
+
+        public FilmstripRepository(FilmstripContext context)
+        {
+            _context = context;
+        }
+
+        public void Create(Filmstrip entity)
+        {
+            _context.Filmstrips.Add(entity);
+        }
+
+        public IEnumerable<Filmstrip> Get()
+        {
+            return _context.Filmstrips.ToList();
+        }
+
+        public Filmstrip Get(string id)
+        {
+            return _context.Filmstrips.Find(id);
+        }
+
+        public void Update(Filmstrip entity)
+        {
+            _context.Filmstrips.Update(entity);
+        }
+
+        public void Delete(string id)
+        {
+            var filmstrip = Get(id);
+            if (filmstrip != null)
+                _context.Filmstrips.Remove(filmstrip);
+        }
+
+        public void SaveChanges()
+        {
+            _context.SaveChanges();
+        }
+    }
+}
+using Core;
+using Repositorys.Context;
+using Repositorys.Interfaces;
+
+namespace Repositorys.Repositories
+{
+    public class GenreRepository : BaseInterface<Genre>
+    {
+        private readonly FilmstripContext _context;
+
+        public GenreRepository(FilmstripContext context)
+        {
+            _context = context;
+        }
+
+        public void Create(Genre entity)
+        {
+            _context.Genres.Add(entity);
+        }
+
+        public IEnumerable<Genre> Get()
+        {
+            return _context.Genres.ToList();
+        }
+
+        public Genre Get(int id)
+        {
+            return _context.Genres.Find(id);
+        }
+
+        public void Update(Genre entity)
+        {
+            _context.Genres.Update(entity);
+        }
+
+        public void Delete(int id)
+        {
+            var genre = Get(id);
+            if (genre != null)
+                _context.Genres.Remove(genre);
+        }
+
+        public void SaveChanges()
+        {
+            _context.SaveChanges();
+        }
+    }
+}
+using Core;
+using Repositorys.Context;
+using Repositorys.Interfaces;
+
+namespace Repositorys.Repositories
+{
+    public class AvarageRatingRepository : BaseInterface<AvarageRating>
+    {
+        private readonly FilmstripContext _context;
+
+        public AvarageRatingRepository(FilmstripContext context)
+        {
+            _context = context;
+        }
+
+        public void Create(AvarageRating entity)
+        {
+            _context.AvarageRatings.Add(entity);
+        }
+
+        public IEnumerable<AvarageRating> Get()
+        {
+            return _context.AvarageRatings.ToList();
+        }
+
+        public AvarageRating Get(int id)
+        {
+            return _context.AvarageRatings.Find(id);
+        }
+
+        public void Update(AvarageRating entity)
+        {
+            _context.AvarageRatings.Update(entity);
+        }
+
+        public void Delete(int id)
+        {
+            var avarageRating = Get(id);
+            if (avarageRating != null)
+                _context.AvarageRatings.Remove(avarageRating);
+        }
+
+        public void SaveChanges()
+        {
+            _context.SaveChanges();
+        }
+    }
+}
+using Core;
+using Repositorys.Context;
+using Repositorys.Interfaces;
+
+namespace Repositorys.Repositories
+{
+    public class TypesRepository : BaseInterface<Types>
+    {
+        private readonly FilmstripContext _context;
+
+        public TypesRepository(FilmstripContext context)
+        {
+            _context = context;
+        }
+
+        public void Create(Types entity)
+        {
+            _context.Types.Add(entity);
+        }
+
+        public IEnumerable<Types> Get()
+        {
+            return _context.Types.ToList();
+        }
+
+        public Types Get(int id)
+        {
+            return _context.Types.Find(id);
+        }
+
+        public void Update(Types entity)
+        {
+            _context.Types.Update(entity);
+        }
+
+        public void Delete(int id)
+        {
+            var type = Get(id);
+            if (type != null)
+                _context.Types.Remove(type);
+        }
+
+        public void SaveChanges()
+        {
+            _context.SaveChanges();
+        }
+    }
+}
+using Core;
+using Repositorys.Context;
+using Repositorys.Interfaces;
+
+namespace Repositorys.Repositories
+{
+    public class YearReleaseRepository : BaseInterface<YearRelease>
+    {
+        private readonly FilmstripContext _context;
+
+        public YearReleaseRepository(FilmstripContext context)
+        {
+            _context = context;
+        }
+
+        public void Create(YearRelease entity)
+        {
+            _context.YearReleases.Add(entity);
+        }
+
+        public IEnumerable<YearRelease> Get()
+        {
+            return _context.YearReleases.ToList();
+        }
+
+        public YearRelease Get(int id)
+        {
+            return _context.YearReleases.Find(id);
+        }
+
+        public void Update(YearRelease entity)
+        {
+            _context.YearReleases.Update(entity);
+        }
+
+        public void Delete(int id)
+        {
+            var yearRelease = Get(id);
+            if (yearRelease != null)
+                _context.YearReleases.Remove(yearRelease);
+        }
+
+        public void SaveChanges()
+        {
+            _context.SaveChanges();
+        }
+    }
+}
+namespace Core.OtherTables
+{
+    public class FilmstripGenre
+    {
+        // Composite Key
+        public string FilmstripId { get; set; } // FK до Filmstrip
+        public int GenreId { get; set; }        // FK до Genre
+
+        // Навігаційні властивості
+        public Filmstrip Filmstrip { get; set; }
+        public Genre Genre { get; set; }
+    }
+}
+using System.ComponentModel.DataAnnotations;
+
+namespace Core
+{
+    public class AvarageRating
+    {
+        [Key]
+        public int id { get; set; }  // Унікальний ідентифікатор
+        public double avarageRating { get; set; }  // Середній рейтинг
+
+        // Навігаційна властивість для зв'язку "один-до-багатьох" з Filmstrip
+        public ICollection<Filmstrip> Filmstrips { get; set; }
+    }
+}
+using Core.OtherTables;
+using System.ComponentModel.DataAnnotations;
+
+namespace Core
+{
+    public class Filmstrip
+    {
+        [Key]
+        public string id { get; set; }  // Унікальний ідентифікатор
+        public string name { get; set; }  // Назва фільму
+        public int NumVotes { get; set; }  // Кількість голосів
+
+        // Зовнішні ключі
+        public int typeId { get; set; }
+        public int yearReleaseId { get; set; }
+        public int avarageRatingsId { get; set; }
+
+        // Навігаційні властивості
+        public Types type { get; set; }
+        public YearRelease yearRelease { get; set; }
+        public AvarageRating avarageRating { get; set; }
+
+        // Зв’язок "багато-до-багатьох"
+        public ICollection<FilmstripGenre> FilmstripGenres { get; set; }
+    }
+}using Core.OtherTables;
+using System.ComponentModel.DataAnnotations;
+
+namespace Core
+{
+    public class Genre
+    {
+        [Key]
+        public int id { get; set; }  // Унікальний ідентифікатор
+        public string name { get; set; }  // Назва жанру
+
+        // Зв’язок "багато-до-багатьох"
+        public ICollection<FilmstripGenre> FilmstripGenres { get; set; }
+    }
+}
+using System.ComponentModel.DataAnnotations;
+
+namespace Core
+{
+    public class Types
+    {
+        [Key]
+        public int id { get; set; }  // Унікальний ідентифікатор
+        public string name { get; set; }  // Назва типу (наприклад, "tvSeries")
+
+        // Навігаційна властивість для зв'язку "один-до-багатьох" з Filmstrip
+        public ICollection<Filmstrip> Filmstrips { get; set; }
+    }
+}
+using System.ComponentModel.DataAnnotations;
+
+namespace Core
+{
+    public class YearRelease
+    {
+        [Key]
+        public int id { get; set; }  // Унікальний ідентифікатор
+        public int year { get; set; }  // Рік випуску
+
+        // Навігаційна властивість для зв'язку "один-до-багатьох" з Filmstrip
+        public ICollection<Filmstrip> Filmstrips { get; set; }
+    }
+}
+using CsvHelper;
+using Core;
+using Repositorys.Context;
+using System.Globalization;
+using System.IO;
+using Core.OtherTables;
+using Repositorys.Context;
+
+
+namespace UI.Parsers
+{
+    public class FilmstripParser
+    {
+        public static List<Filmstrip> Parse(string filePath, FilmstripContext context)
+        {
+            using var reader = new StreamReader(filePath);
+            using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
+
+            csv.Read();
+            csv.ReadHeader();
+
+            var filmstrips = new List<Filmstrip>();
+            while (csv.Read())
+            {
+                string id = csv.GetField("id");
+                string name = csv.GetField("title");
+                int numVotes = int.Parse(csv.GetField("numVotes"));
+
+                string releaseYearStr = csv.GetField("releaseYear");
+                int yearReleaseId = GetYearReleaseId(releaseYearStr, context);
+
+                string avgRatingStr = csv.GetField("averageRating");
+                int avarageRatingsId = GetAverageRatingId(avgRatingStr, context);
+
+                var filmstrip = new Filmstrip
+                {
+                    id = id,
+                    name = name,
+                    NumVotes = numVotes,
+                    yearReleaseId = yearReleaseId,
+                    avarageRatingsId = avarageRatingsId,
+                };
+
+                // Обробка жанрів
+                filmstrip.FilmstripGenres = ParseGenres(csv.GetField("genres"), context, filmstrip);
+
+                // Тип фільму
+                filmstrip.typeId = GetTypeId(csv.GetField("type"), context);
+
+                filmstrips.Add(filmstrip);
+            }
+            return filmstrips;
+        }
+
+        public static void SaveToDatabase(FilmstripContext context, List<Filmstrip> filmstrips)
+        {
+            foreach (var filmstrip in filmstrips)
+            {
+                if (!context.Filmstrips.Any(f => f.id == filmstrip.id))
+                {
+                    context.Filmstrips.Add(filmstrip);
+                }
+            }
+            context.SaveChanges();
+        }
+
+        private static int GetYearReleaseId(string yearStr, FilmstripContext context)
+        {
+            if (int.TryParse(yearStr, out int releaseYear))
+            {
+                var yearRelease = context.YearReleases.FirstOrDefault(y => y.year == releaseYear)
+                    ?? new YearRelease { year = releaseYear };
+                if (yearRelease.id == 0) context.YearReleases.Add(yearRelease);
+                context.SaveChanges();
+                return yearRelease.id;
+            }
+            throw new Exception($"Invalid year format: {yearStr}");
+        }
+
+
+        private static int GetAverageRatingId(string avgRatingStr, FilmstripContext context)
+        {
+            if (double.TryParse(avgRatingStr.Replace(".", ","), out var avgRating))
+            {
+                var rating = context.AvarageRatings.FirstOrDefault(a => a.avarageRating == avgRating)
+                    ?? new AvarageRating { avarageRating = avgRating };
+                if (rating.id == 0) context.AvarageRatings.Add(rating);
+                context.SaveChanges();
+                return rating.id;
+            }
+            throw new Exception($"Invalid average rating format: {avgRatingStr}");
+        }
+
+        private static ICollection<FilmstripGenre> ParseGenres(string genresStr, FilmstripContext context, Filmstrip filmstrip)
+        {
+            var genreNames = genresStr.Split(',', StringSplitOptions.RemoveEmptyEntries)
+                                      .Select(g => g.Trim());
+            var filmstripGenres = new List<FilmstripGenre>();
+
+            foreach (var genreName in genreNames)
+            {
+                var genre = context.Genres.FirstOrDefault(g => g.name == genreName)
+                    ?? new Genre { name = genreName };
+                if (genre.id == 0)
+                {
+                    context.Genres.Add(genre);
+                    context.SaveChanges();
+                }
+                filmstripGenres.Add(new FilmstripGenre { Filmstrip = filmstrip, Genre = genre });
+            }
+
+            return filmstripGenres;
+        }
+
+        private static int GetTypeId(string typeStr, FilmstripContext context)
+        {
+            var type = context.Types.FirstOrDefault(t => t.name == typeStr)
+                ?? new Types { name = typeStr };
+            if (type.id == 0)
+            {
+                context.Types.Add(type);
+                context.SaveChanges();
+            }
+            return type.id;
+        }
+    }
+}
+using CsvHelper;
+using Core;
+using Repositorys.Context;
+using System.Globalization;
+using System.IO;
+using Repositorys.Context;
+
+
+namespace UI.Parsers
+{
+    public class GenreParser
+    {
+        public static List<Genre> Parse(string filePath)
+        {
+            using var reader = new StreamReader(filePath);
+            using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
+
+            csv.Read();
+            csv.ReadHeader();
+
+            var genres = new List<Genre>();
+            while (csv.Read())
+            {
+                string genresField = csv.GetField("genres");
+
+                if (!string.IsNullOrEmpty(genresField))
+                {
+                    var genreNames = genresField.Split(',', StringSplitOptions.RemoveEmptyEntries);
+                    foreach (var genreName in genreNames)
+                    {
+                        var trimmedName = genreName.Trim();
+
+                        if (!genres.Any(g => g.name.Equals(trimmedName, StringComparison.OrdinalIgnoreCase)))
+                        {
+                            genres.Add(new Genre { name = trimmedName });
+                        }
+                    }
+                }
+            }
+            return genres;
+        }
+
+        public static void SaveToDatabase(FilmstripContext context, List<Genre> genres)
+        {
+            var existingGenres = context.Genres.Select(g => g.name.ToLower()).ToHashSet();
+
+            foreach (var genre in genres)
+            {
+                if (!existingGenres.Contains(genre.name.ToLower()))
+                {
+                    context.Genres.Add(genre);
+                }
+            }
+
+            context.SaveChanges();
+        }
+
+    }
+}
+using CsvHelper;
+using Core;
+using Repositorys.Context;
+using System.Globalization;
+using System.IO;
+using Repositorys.Context;
+
+
+namespace UI.Parsers
+{
+    public class RatingParser
+    {
+        public static List<AvarageRating> Parse(string filePath)
+        {
+            using var reader = new StreamReader(filePath);
+            using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
+
+            csv.Read();
+            csv.ReadHeader();
+
+            var avgRatings = new List<AvarageRating>();
+            while (csv.Read())
+            {
+                string ratingStr = csv.GetField("averageRating").Replace(".", ",");
+
+                if (double.TryParse(ratingStr, out double rating))
+                {
+                    if (!avgRatings.Any(a => a.avarageRating == rating))
+                    {
+                        avgRatings.Add(new AvarageRating { avarageRating = rating });
+                    }
+                }
+            }
+            return avgRatings;
+        }
+
+        public static void SaveToDatabase(FilmstripContext context, List<AvarageRating> avgRatings)
+        {
+            foreach (var rating in avgRatings)
+            {
+                if (!context.AvarageRatings.Any(a => a.avarageRating == rating.avarageRating))
+                {
+                    context.AvarageRatings.Add(rating);
+                }
+            }
+            context.SaveChanges();
+        }
+    }
+}
+using CsvHelper;
+using Core;
+using Repositorys.Context;
+using System.Globalization;
+using System.IO;
+using Repositorys.Context;
+
+
+namespace UI.Parsers
+{
+    public class TypeParser
+    {
+        public static List<Types> Parse(string filePath)
+        {
+            using var reader = new StreamReader(filePath);
+            using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
+
+            csv.Read();
+            csv.ReadHeader();
+
+            var types = new List<Types>();
+            while (csv.Read())
+            {
+                var typeField = csv.GetField("type");
+
+                if (!string.IsNullOrEmpty(typeField))
+                {
+                    var trimmedName = typeField.Trim();
+
+                    if (!types.Any(t => t.name.Equals(trimmedName, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        types.Add(new Types { name = trimmedName });
+                    }
+                }
+            }
+            return types;
+        }
+
+        public static void SaveToDatabase(FilmstripContext context, List<Types> types)
+        {
+            var existingTypes = context.Types.Select(t => t.name.ToLower()).ToHashSet();
+
+            foreach (var type in types)
+            {
+                if (!existingTypes.Contains(type.name.ToLower()))
+                {
+                    context.Types.Add(type);
+                }
+            }
+
+            context.SaveChanges();
+        }
+
+    }
+}
+using Core;
+using CsvHelper;
+using System.Globalization;
+using System.IO;
+using Repositorys.Context;
+
+
+namespace UI.Parsers
+{
+    class YearParser
+    {
+        public static List<YearRelease> Parse(string filePath)
+        {
+            using var reader = new StreamReader(filePath);
+            using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
+
+            csv.Read();
+            csv.ReadHeader();
+
+            var yearReleases = new List<YearRelease>();
+            while (csv.Read())
+            {
+                string yearStr = csv.GetField("releaseYear");
+
+                // Перетворення рядка у ціле число
+                if (int.TryParse(yearStr, out int year))
+                {
+                    // Додаємо лише унікальні роки
+                    if (!yearReleases.Any(y => y.year == year))
+                    {
+                        yearReleases.Add(new YearRelease { year = year });
+                    }
+                }
+            }
+            return yearReleases;
+        }
+
+        public static void SaveToDatabase(FilmstripContext context, List<YearRelease> yearReleases)
+        {
+            foreach (var yearRelease in yearReleases)
+            {
+                if (!context.YearReleases.Any(y => y.year == yearRelease.year))
+                {
+                    context.YearReleases.Add(yearRelease);
+                }
+            }
+            context.SaveChanges();
+        }
+    }
+}
+using System.IO;
+using System.Text;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
+using System.Windows.Shapes;
+using UI.Parsers;
+using Repositorys.Context;
+using Azure;
+
+
+namespace UI
+{
+    /// <summary>
+    /// Interaction logic for MainWindow.xaml
+    /// </summary>
+    public partial class MainWindow : Window
+    {
+        public MainWindow()
+        {
+            InitializeComponent();
+        } 
+
+        private void Button_Click_WORK(object sender, RoutedEventArgs e)
+        {
+            SortedFilms sortedFilms = new SortedFilms();
+            sortedFilms.ShowDialog();
+        }
+        private void Button_Click_EDIT_T(object sender, RoutedEventArgs e)        { }
+        private void Button_Click_EDIT_G(object sender, RoutedEventArgs e)        { }
+        private void Button_Click_EDIT_F(object sender, RoutedEventArgs e)
+        {
+            Operations operationsWithFilms = new Operations();
+            operationsWithFilms.ShowDialog();
+        }
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                // Шлях до єдиного CSV-файлу
+                string filePath = $@"{PathTb.Text}";
+
+                // Перевірка на існування файлу
+                if (!File.Exists(filePath))
+                {
+                    MessageBox.Show("Файл не знайдено. Перевірте шлях!", "Помилка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
+                using (var context = new FilmstripContext())
+                {
+                    // Парсинг YearRelease
+                    var yearReleases = YearParser.Parse(filePath);
+                    YearParser.SaveToDatabase(context, yearReleases);
+
+                    // Парсинг Types
+                    var types = TypeParser.Parse(filePath); // Передаємо context, якщо потрібно
+                    TypeParser.SaveToDatabase(context, types);
+
+                    // Парсинг Genres
+                    var genres = GenreParser.Parse(filePath);
+                    GenreParser.SaveToDatabase(context, genres);
+
+                    // Парсинг AvarageRating
+                    var avgRatings = RatingParser.Parse(filePath);
+                    RatingParser.SaveToDatabase(context, avgRatings);
+
+                    // Парсинг Filmstrip
+                    var filmstrips = FilmstripParser.Parse(filePath, context);
+                    FilmstripParser.SaveToDatabase(context, filmstrips);
+
+                    // Повідомлення про успішний парсинг
+                    MessageBox.Show("Парсинг завершено успішно!", "Успіх", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+            }
+            catch (Exception ex)
+            {
+                // Виводимо повідомлення про помилку
+                MessageBox.Show($"Сталася помилка: {ex.Message}", "Помилка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+    }
+}using Repositorys.Repositories;
+using Repositorys.Context;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Shapes;
+using Core;
+
+namespace UI
+{
+    /// <summary>
+    /// Interaction logic for SortedFilms.xaml
+    /// </summary>
+    public partial class SortedFilms : Window
+    {
+        private readonly Repositorys.Context.FilmstripContext _context;
+        private readonly TypesRepository _typesRepository;
+        private readonly GenreRepository _genreRepository;
+        private bool _isAscending = true; // Прапорець для визначення напряму сортування
+        private bool _isAscendingForRating = true;
+        private bool _isAscendingForVotes = true;
+
+        public SortedFilms()
+        {
+            InitializeComponent();
+            _context = new Repositorys.Context.FilmstripContext();
+            _typesRepository = new TypesRepository(_context);
+            _genreRepository = new GenreRepository(_context);
+            LoadTypes();
+            LoadGenres();
+        }
+        private void LoadTypes()
+        {
+            TypeComboBox.ItemsSource = _typesRepository.Get().ToList();
+        }
+        private void LoadGenres()
+        {
+            GenreCbox.ItemsSource = _genreRepository.Get().ToList();
+        }
+
+        // Обробник для кнопки "SORT BY YEAR"
+        private void YearB(object sender, RoutedEventArgs e)
+        {
+            var sortedFilms = _isAscending
+       ? _context.Filmstrips
+                 .OrderBy(f => f.yearReleaseId)
+                 .ToList()
+       : _context.Filmstrips
+                 .OrderByDescending(f => f.yearReleaseId)
+                 .ToList();
+
+            FilmsListbox.ItemsSource = sortedFilms;
+
+            // Змінюємо стан сортування
+            _isAscending = !_isAscending;
+        }
+
+        // Обробник для кнопки "SORT BY RATING"
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            var sortedFilms = _isAscendingForRating
+                 ? _context.Filmstrips
+                .OrderBy(f => f.avarageRatingsId)
+                .ToList()
+                 : _context.Filmstrips
+                .OrderByDescending(f => f.avarageRatingsId)
+                .ToList();
+
+            FilmsListbox.ItemsSource = sortedFilms;
+
+            // Змінюємо стан сортування
+            _isAscendingForRating = !_isAscendingForRating;
+        }
+
+        // Обробник для кнопки "SORT BY VOTES"
+        private void VotesB(object sender, RoutedEventArgs e)
+        {
+            var sortedFilms = _isAscendingForVotes
+                  ? _context.Filmstrips
+                 .OrderBy(f => f.NumVotes)
+                 .ToList()
+                  : _context.Filmstrips
+                 .OrderByDescending(f => f.NumVotes)
+                 .ToList();
+
+            FilmsListbox.ItemsSource = sortedFilms;
+
+            // Змінюємо стан сортування
+            _isAscendingForVotes = !_isAscendingForVotes;
+        }
+
+        // Обробник для кнопки "SEARCH BY TYPE"
+        private void TypeB(object sender, RoutedEventArgs e)
+        {
+            if (TypeComboBox.SelectedItem is Types selectedType)
+            {
+                var results = _context.Filmstrips
+                                      .Where(f => f.typeId == selectedType.id)
+                                      .ToList();
+
+                if (results.Any())
+                {
+                    FilmsListbox.ItemsSource = results; // Відображення результатів у ListView
+                }
+                else
+                {
+                    MessageBox.Show("Фільмів із вказаним типом не знайдено!", "Результати пошуку", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+            }
+            else
+            {
+                MessageBox.Show("Будь ласка, виберіть тип із списку!", "Помилка", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        }
+
+        // Обробник для кнопки "SEARCH BY GENRE"
+        private void Button_Click_Genre(object sender, RoutedEventArgs e)
+        {
+            if (GenreCbox.SelectedItem is Genre selectedGenre)
+            {
+                var results = _context.FilmstripGenres
+                                      .Where(fg => fg.GenreId == selectedGenre.id)
+                                      .Select(fg => fg.Filmstrip)
+                                      .ToList();
+
+                if (results.Any())
+                {
+                    FilmsListbox.ItemsSource = results; // Відображення результатів у ListView
+                }
+                else
+                {
+                    MessageBox.Show("Фільмів із вказаним жанром не знайдено!", "Результати пошуку", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+            }
+            else
+            {
+                MessageBox.Show("Будь ласка, виберіть жанр із списку!", "Помилка", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        }
+
+        // Обробник для кнопки "SEARCH BY YEAR"
+        private void Button_Click_Year(object sender, RoutedEventArgs e)
+        {
+            if (int.TryParse(Search_Year.Text, out int year))
+            {
+                var results = _context.Filmstrips
+                                      .Where(f => f.yearRelease.year == year)
+                                      .ToList();
+
+                if (results.Any())
+                {
+                    FilmsListbox.ItemsSource = results; // Відобразити результати у ListView
+                }
+                else
+                {
+                    MessageBox.Show("Фільмів за вказаним роком не знайдено!", "Результати пошуку", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+            }
+            else
+            {
+                MessageBox.Show("Будь ласка, введіть дійсний рік!", "Помилка", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        }
+
+
+        // Обробник для кнопки "SEARCH BY NAME"
+        
+        private void Button_Click_Search(object sender, RoutedEventArgs e)
+        {
+            string searchName = Search_Name.Text; // Отримати введене ім'я з текстового поля
+            try
+            {
+                if (!string.IsNullOrWhiteSpace(searchName))
+                {
+                    var results = _context.Filmstrips
+                      .Where(f => f.name.ToLower().Contains(searchName.ToLower()))
+                      .ToList();
+
+
+                    if (results.Any())
+                    {
+                        FilmsListbox.ItemsSource = results; // Припустимо, у вас є ListView для відображення результатів
+                    }
+                    else
+                    {
+                        MessageBox.Show("Фільмів не знайдено!", "Результати пошуку", MessageBoxButton.OK, MessageBoxImage.Information);
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Будь ласка, введіть назву для пошуку!", "Помилка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Сталася помилка: {ex.Message}", "Помилка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            }
+        
+    }
+}
